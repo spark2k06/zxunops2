@@ -1,4 +1,5 @@
-# zxunops2
+# zxunops2 (final version)
+
 Converts the ZX Spectrum keyboard into PS/2 for ZXUno
 
 * Original base code by Quest
