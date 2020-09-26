@@ -5,7 +5,7 @@ Conversor de teclado ZX Spectrum a PS/2
 * Codigo base original por Quest
 * Desarrollo inicial y primeros atajos de teclado por Neuro (@neurorulez)
 * Mejoras, optimizaciones y nuevos atajos de teclado por @spark2k06
-* Gracias a @desUBIkado por hacer de Betatester y proporcionar nuevas ideas para la última versión.
+* Gracias a @desUBIkado por hacer de Betatester y proporcionar nuevas ideas para la versión alternativa.
 
 */
 
