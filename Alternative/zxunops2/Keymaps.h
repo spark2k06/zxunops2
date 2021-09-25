@@ -10,7 +10,7 @@
 //KEY_ENTER: NADA KEY_L: =        KEY_K: +        KEY_J: -        KEY_H: (flecha)
 //KEY_SPACE: NADA NADA            KEY_M: .        KEY_N: ,        KEY_B: *
 
-const uint8_t version[8] = { 2,6,0,9,2,0,2,0 }; //DDMMAAAA
+const uint8_t version[8] = { 2,5,0,9,2,0,2,1 }; //DDMMAAAA
 
 const uint8_t rama[1] = { 2 }; // Rama del firmware (1: Original, 2: Alternativa)
 
@@ -252,17 +252,17 @@ const uint8_t rama[1] = { 2 }; // Rama del firmware (1: Original, 2: Alternativa
 #define MODO_A       ori
 #define MODO_B       sam
 #define MODO_C       jup
-#define MODO_D       sms
+#define MODO_D       zx81
 #define MODO_E       c16
 #define MODO_F       ht8
 #define MODO_G       galak
 #define MODO_H       multi
-#define MODO_I       -1
-#define MODO_J       -1
-#define MODO_K       -1
-#define MODO_L       -1
-#define MODO_M       -1
-#define MODO_N       -1
+#define MODO_I       zx80
+#define MODO_J       atom
+#define MODO_K       cpet
+#define MODO_L       eg2000
+#define MODO_M       lynx
+#define MODO_N       enterp
 #define MODO_O       -1
 #define MODO_P       -1
 #define MODO_Q       -1
@@ -279,16 +279,16 @@ const uint8_t rama[1] = { 2 }; // Rama del firmware (1: Original, 2: Alternativa
 #define MODO_CS      -1
 #define MODO_ENTER   -1
 #define MODO_SPACE   -1
-#define MODO_1       cpc
-#define MODO_2       msx
-#define MODO_3       c64
-#define MODO_4       at8
-#define MODO_5       bbc
-#define MODO_6       aco
-#define MODO_7       ap2
-#define MODO_8       vic
-#define MODO_9       pc
-#define MODO_0       zx
+#define MODO_1       zx
+#define MODO_2       cpc
+#define MODO_3       msx
+#define MODO_4       c64
+#define MODO_5       at8
+#define MODO_6       bbc
+#define MODO_7       electron
+#define MODO_8       ap2
+#define MODO_9       vic
+#define MODO_0       pc
 
 #define NUMSW 2 //Numero de botones externos en Arduino
 #define MAXKB pc //Numero de mapas de teclado maximo (sin contar el de ZX) el pc siempre sera el ultimo.
@@ -300,7 +300,7 @@ const uint8_t fkbmode0[15] = { KEY_Z,KEY_X,KEY_P,KEY_A,KEY_R,KEY_T,KEY_I,KEY_A,K
 const uint8_t fkbmode1[12] = { KEY_Z,KEY_X, KEY_F,KEY_U,KEY_L,KEY_L,KEY_C,KEY_O,KEY_M,KEY_B,KEY_O,KEY_S };
 const uint8_t fkbmode2[6] = { KEY_Z,KEY_X,KEY_P,KEY_U,KEY_R,KEY_E };
 
-typedef enum { zx, cpc, msx, c64, at8, bbc, aco, ap2, vic, ori, sam, jup, sms, c16, ht8, galak, multi, pc, pcxt, kbext } KBMODE;
+typedef enum { zx, cpc, msx, c64, at8, bbc, electron, ap2, vic, ori, sam, jup, zx80, zx81, c16, ht8, galak, multi, atom, cpet, eg2000, lynx, enterp, pc, pcxt, kbext } KBMODE;
 
 #ifdef atmega644
 const uint8_t mapZX[ROWS][COLS] = {
@@ -338,7 +338,7 @@ const uint8_t mapEXT[ROWS8][COLS5] = { //Mapa especial con caps shift (Igual en 
 { KEY_BACKSP,          0,  KEY_RIGHT,     KEY_UP,   KEY_DOWN },
 {          0,          0,          0,          0,          0 },
 {          0,          0,          0,          0,          0 },
-{    KEY_TAB,          0,          0,          0,          0 },
+{          0,          0,          0,          0,          0 },
 { KEY_ESCAPE,          0,          0,          0,          0 }
 };
 #ifdef atmega644
@@ -402,7 +402,7 @@ const uint8_t modXT1[ROWS8][COLS5] = { //Mod de PC-XT CodeSet1 1 hay q usar Shif
 {          0,          0,          0,          0,          1 }
 };
 
-const uint8_t mapMODO[ROWS8][COLS5] = {
+const int8_t mapMODO[ROWS8][COLS5] = {
 {     MODO_1,     MODO_2,     MODO_3,     MODO_4,     MODO_5 },
 {     MODO_Q,     MODO_W,     MODO_E,     MODO_R,     MODO_T },
 {     MODO_A,     MODO_S,     MODO_D,     MODO_F,     MODO_G },
@@ -419,17 +419,24 @@ const uint8_t nomZX[] = { 2,KEY_Z,KEY_X,1 }; //Numero de Letras,(letras[n],,),CK
 const uint8_t nomCPC[] = { 3,KEY_C,KEY_P,KEY_C,4};
 const uint8_t nomMSX[] = { 3,KEY_M,KEY_S,KEY_X,4};
 const uint8_t nomC64[] = { 3,KEY_C,KEY_6,KEY_4,4};
-const uint8_t nomC16[] = { 3,KEY_C,KEY_1,KEY_6,4 };
-const uint8_t nomHT8[] = { 5,KEY_T,KEY_R,KEY_S, KEY_8, KEY_0,6 };
 const uint8_t nomAT8[] = { 5,KEY_A,KEY_T,KEY_A,KEY_R,KEY_I,4};
 const uint8_t nomBBC[] = { 3,KEY_B,KEY_B,KEY_C,4};
-const uint8_t nomACO[] = { 5,KEY_A,KEY_C,KEY_O,KEY_R,KEY_N,4};
+const uint8_t nomELECTRON[] = { 8,KEY_E,KEY_L,KEY_E,KEY_C,KEY_T,KEY_R,KEY_O,KEY_N,4};
+const uint8_t nomAP2[] = { 5,KEY_A,KEY_P,KEY_P,KEY_L,KEY_E,4};
 const uint8_t nomVIC[] = { 3,KEY_V,KEY_I,KEY_C,4};
+const uint8_t nomPC[] = { 4,KEY_P,KEY_C,KEY_X,KEY_T,4};
+
 const uint8_t nomORI[] = { 4,KEY_O,KEY_R,KEY_I,KEY_C,4};
 const uint8_t nomSAM[] = { 3,KEY_S,KEY_A,KEY_M,4};
 const uint8_t nomJUP[] = { 7,KEY_J,KEY_U,KEY_P,KEY_I,KEY_T,KEY_E,KEY_R,4};
-const uint8_t nomAP2[] = { 5,KEY_A,KEY_P,KEY_P,KEY_L,KEY_E,4};
-const uint8_t nomPC[] = { 4,KEY_P,KEY_C,KEY_X,KEY_T,4};
-const uint8_t nomSMS[] = { 3,KEY_S,KEY_M,KEY_S,4 };
+const uint8_t nomZX81[] = { 4,KEY_Z,KEY_X,KEY_8,KEY_1,4 };
+const uint8_t nomC16[] = { 3,KEY_C,KEY_1,KEY_6,4 };
+const uint8_t nomHT8[] = { 5,KEY_T,KEY_R,KEY_S, KEY_8, KEY_0,6 };
 const uint8_t nomGALAK[] = { 9,KEY_G,KEY_A,KEY_L,KEY_A,KEY_K,KEY_S,KEY_I,KEY_J,KEY_A,4 };
 const uint8_t nomMULTI[] = { 9,KEY_M,KEY_U,KEY_L,KEY_T,KEY_I,KEY_C,KEY_O,KEY_M,KEY_P,4 };
+const uint8_t nomZX80[] = { 4,KEY_Z,KEY_X,KEY_8,KEY_0,4 };
+const uint8_t nomATOM[] = { 4,KEY_A,KEY_T,KEY_O,KEY_M,4 };
+const uint8_t nomCPET[] = { 4,KEY_C,KEY_P,KEY_E,KEY_T,4 };
+const uint8_t nomEG2000[] = { 6,KEY_E,KEY_G,KEY_2,KEY_0,KEY_0,KEY_0,4 };
+const uint8_t nomLYNX[] = { 4,KEY_L,KEY_Y,KEY_N,KEY_X,4 };
+const uint8_t nomenterp[] = { 6,KEY_E,KEY_N,KEY_T,KEY_E,KEY_R,KEY_P,4 };

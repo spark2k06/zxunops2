@@ -7,19 +7,29 @@
 
 #define symbols_cpc
 #define symbols_msx
-#define symbols_c16_c64
+#define symbols_c64
 #define symbols_at8
 #define symbols_bbc
-#define symbols_aco
+#define symbols_electron
 #define symbols_ap2
 #define symbols_vic
+#define symbols_pc
+
 #define symbols_ori
 #define symbols_sam
 #define symbols_jup
+#define symbols_zx81
+#define symbols_c16
 #define symbols_ht8
 #define symbols_galak
 #define symbols_multi
-#define symbols_pc
+#define symbols_zx80
+#define symbols_atom
+#define symbols_cpet
+#define symbols_eg2000
+#define symbols_lynx
+#define symbols_enterp
+
 
 #define PA 1 //
 #define PB 2 //

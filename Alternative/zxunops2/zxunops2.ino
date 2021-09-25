@@ -14,8 +14,8 @@ Conversor de teclado ZX Spectrum a PS/2
 #include <inttypes.h>
 #include <util/delay.h>
 #include <avr/eeprom.h>
-#include "config.h"
-#include "keymaps.h"
+#include "Config.h"
+#include "Keymaps.h"
 
 #define HI 1
 #define LO 0
@@ -531,17 +531,23 @@ KBMODE cambiarmodo2(KBMODE modokb)
     if (modokb == c64) CKm = nomC64[nomC64[0] + 1];
     if (modokb == at8) CKm = nomAT8[nomAT8[0] + 1];
     if (modokb == bbc) CKm = nomBBC[nomBBC[0] + 1];
-    if (modokb == aco) CKm = nomACO[nomACO[0] + 1];
+    if (modokb == electron) CKm = nomELECTRON[nomELECTRON[0] + 1];
     if (modokb == ap2) CKm = nomAP2[nomAP2[0] + 1];
     if (modokb == vic) CKm = nomVIC[nomVIC[0] + 1];
     if (modokb == ori) CKm = nomORI[nomORI[0] + 1];
     if (modokb == sam) CKm = nomSAM[nomSAM[0] + 1];
-    if (modokb == jup) CKm = nomJUP[nomJUP[0] + 1];
-    if (modokb == sms) CKm = nomSMS[nomSMS[0] + 1];
+    if (modokb == jup) CKm = nomJUP[nomJUP[0] + 1];    
     if (modokb == c16) CKm = nomC16[nomC16[0] + 1];
     if (modokb == ht8) CKm = nomHT8[nomHT8[0] + 1];
     if (modokb == galak) CKm = nomGALAK[nomGALAK[0] + 1];
     if (modokb == multi) CKm = nomMULTI[nomMULTI[0] + 1];
+    if (modokb == zx80) CKm = nomZX80[nomZX80[0] + 1];
+    if (modokb == zx81) CKm = nomZX81[nomZX81[0] + 1];
+    if (modokb == atom) CKm = nomATOM[nomATOM[0] + 1];
+    if (modokb == cpet) CKm = nomCPET[nomCPET[0] + 1];
+    if (modokb == eg2000) CKm = nomEG2000[nomEG2000[0] + 1];
+    if (modokb == lynx) CKm = nomLYNX[nomLYNX[0] + 1];
+    if (modokb == enterp) CKm = nomenterp[nomenterp[0] + 1];
 
     if (modokb == pc) { CKm = nomPC[nomPC[0] + 1]; kbescucha = 1; timeout_escucha = 0; codeset = 2; } // Iniciamos la escucha para que se pueda cambiar al core de PC/XT.
     
@@ -654,7 +660,7 @@ void ejecutarfuncion(unsigned char code)
             break;
 
         case KEY_Y: // NMI
-            if (modo == zx || modo == cpc || modo == jup || modo == sam)
+            if (modo == zx || modo == cpc || modo == jup || modo == sam || modo == zx80 || modo == zx81)
             {
                 // Control+Alt+F5
                 pulsafn(Y_P_ROW, Y_COL, codeset == 1 ? KS1_F5 : KEY_F5, 0, 0, 1, 1, 0, 0);
@@ -662,7 +668,7 @@ void ejecutarfuncion(unsigned char code)
             break;
 
         case KEY_G: // VGA-RGB
-            if (modo == zx || modo == at8 || modo == bbc || modo == vic || modo == ori || modo == sms || modo == ht8)
+            if (modo == zx || modo == at8 || modo == bbc || modo == vic || modo == ori || modo == ht8)
             {
                 pulsafn(A_G_ROW, G_COL, codeset == 1 ? KS1_SCRLCK : KEY_SCRLCK, 0, 0, 1, 1, 0, 0);
             }
@@ -691,20 +697,27 @@ KBMODE cambiarmodo(KBMODE modokb)
     if (modokb == c64) imprimecore(nomC64);
     if (modokb == at8) imprimecore(nomAT8);
     if (modokb == bbc) imprimecore(nomBBC);
-    if (modokb == aco) imprimecore(nomACO);
+    if (modokb == electron) imprimecore(nomELECTRON);
     if (modokb == ap2) imprimecore(nomAP2);
     if (modokb == vic) imprimecore(nomVIC);
     if (modokb == ori) imprimecore(nomORI);
     if (modokb == sam) imprimecore(nomSAM);
-    if (modokb == jup) imprimecore(nomJUP);
-    if (modokb == sms) imprimecore(nomSMS);
+    if (modokb == jup) imprimecore(nomJUP);    
     if (modokb == c16) imprimecore(nomC16);
     if (modokb == ht8) imprimecore(nomHT8);
     if (modokb == galak) imprimecore(nomGALAK);
     if (modokb == multi) imprimecore(nomMULTI);
+    if (modokb == zx80) imprimecore(nomZX80);
+    if (modokb == zx81) imprimecore(nomZX81);
+    if (modokb == atom) imprimecore(nomATOM);
+    if (modokb == cpet) imprimecore(nomCPET);
+    if (modokb == eg2000) imprimecore(nomEG2000);
+    if (modokb == lynx) imprimecore(nomLYNX);
+    if (modokb == enterp) imprimecore(nomenterp);
+    
     if (modokb == pc) { kbescucha = 1; timeout_escucha = 0; codeset = 2; imprimecore(nomPC); } // Iniciamos la escucha para que se pueda cambiar al core de PC/XT.
 
-    if (modokb > pc)
+    if (modokb == -1)
     {
         modokb = auxmodo; // Si no se trata de un modo conocido, mantenemos el anterior y lo imprimimos por pantalla.
         goto muestramodo;
@@ -781,7 +794,8 @@ void pulsafn(unsigned char row, unsigned char col, unsigned char key, unsigned c
     if (alt) { if (codeset == 2) { sendPS2(0xF0); sendPS2(KEY_LALT); } else { sendPS2(KS1_RALT + KS1_RELEASE); } }
     if (altgr) { if (codeset == 2) { sendPS2(0xE0); sendPS2(0xF0); sendPS2(KEY_LALT); } else { sendPS2(0xE0); sendPS2(KS1_RALT + KS1_RELEASE); } }
     if (lwin) { if (codeset == 2) { sendPS2(0xE0); sendPS2(0xF0); sendPS2(KEY_LALT); } else { sendPS2(0xE0); sendPS2(KS1_RALT + KS1_RELEASE); } }
-    _delay_us(5);
+    //_delay_us(5);
+    _delay_ms(100);
     pulsa_y_suelta_teclas_modificadoras(1, 1, 1, 1, 1);
     matriz[row][col] = 0;
 }
@@ -794,6 +808,9 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
     // 0x8 -> RAlt (AltGr)
     // 0x10 -> RCTrl
     // 0x20 -> Requiere 0xE0
+    // 0x40 -> AltCode
+    // 0x80 -> Requiere SHIFT + ENTER de ZX81
+    // 0x80 -> Requiere Symbol de SAM Coupe 
 
     if (modokb == pc && codeset == 1) return; // pcxt tiene su propio mapa con scancodes distintos
 
@@ -802,6 +819,7 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
     {
         switch (modokb)
         {
+
 #ifdef symbols_cpc
         case cpc:
         keymodif = 
@@ -825,7 +843,7 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_X ? KEY_IGUAL : key == KEY_Z ? KEY_PTOCOMA :
         key == KEY_H ? KEY_IGUAL : key == KEY_J ? KEY_MENOS : key == KEY_K ? KEY_COMILLA : key == KEY_L ? KEY_MENOS :
         key == KEY_B ? KEY_PTOCOMA : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
-        (key == KEY_3 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
         break;
 #endif
 
@@ -863,20 +881,18 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         key == KEY_B ? 1 :
         0;   
         key =
-        key == KEY_Q ? KEY_TLD : key == KEY_W ? KEY_TLD : key == KEY_E ? KEY_1 : key == KEY_I ? KEY_IGUAL : 
-        key == KEY_1 ? KEY_1 : key == KEY_2 ? KEY_2 : key == KEY_3 ? KEY_3 : key == KEY_4 ? KEY_4 : 
-        key == KEY_5 ? KEY_5 : key == KEY_6 ? KEY_6 : key == KEY_7 ? KEY_MENOS : key == KEY_8 ? KEY_8 :
-        key == KEY_9 ? KEY_9 : key == KEY_0 ? KEY_SLASH : key == KEY_R ? KEY_LESS : key == KEY_T ? KEY_LESS :
+        key == KEY_Q ? KEY_TLD : key == KEY_W ? KEY_TLD : key == KEY_E ? KEY_1 : key == KEY_I ? KEY_IGUAL :
+        key == KEY_7 ? KEY_MENOS : key == KEY_0 ? KEY_SLASH : key == KEY_R ? KEY_LESS : key == KEY_T ? KEY_LESS :
         key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE : key == KEY_O ? KEY_COMA : key == KEY_P ? KEY_2 :
         key == KEY_A ? KEY_4 : key == KEY_S ? KEY_1 : key == KEY_D ? KEY_TLD : key == KEY_F ? KEY_COMILLA :
         key == KEY_G ? KEY_BKSLASH : key == KEY_H ? KEY_ACORCHE : key == KEY_J ? KEY_SLASH : key == KEY_K ? KEY_CCORCHE :
         key == KEY_L ? KEY_0 : key == KEY_Z ? KEY_PUNTO : key == KEY_X ? KEY_4 : key == KEY_C ? KEY_MENOS : key == KEY_3 ? key :
-        key == KEY_V ? KEY_7 : key == KEY_B ? KEY_CCORCHE : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO : 0;
+        key == KEY_V ? KEY_7 : key == KEY_B ? KEY_CCORCHE : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
+        (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_8 || key == KEY_9) ? key : 0;
         break;
 #endif
 
-#ifdef symbols_c16_c64
-        case c16:
+#ifdef symbols_c64        
         case c64:
         keymodif = 
         key == KEY_0 ? 4 : 
@@ -891,6 +907,7 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         key == KEY_B ? 0 : 
         key == KEY_N ? 0 : 
         key == KEY_M ? 0 : 
+        key == KEY_X ? 0 : 
         1;   
         key =
         key == KEY_0 ? KEY_ACORCHE :
@@ -898,8 +915,8 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         key == KEY_Y ? KEY_PTOCOMA : key == KEY_U ? KEY_COMILLA : key == KEY_O ? KEY_COMILLA : key == KEY_P ? KEY_2 :
         key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_Z ? KEY_PTOCOMA : key == KEY_H ? KEY_BKSLASH :
         key == KEY_J ? KEY_MENOS : key == KEY_K ? KEY_F10 : key == KEY_L ? KEY_IGUAL : key == KEY_B ? KEY_CCORCHE :
-        key == KEY_M ? KEY_PUNTO : key == KEY_N ? KEY_COMA :
-        (key == KEY_3 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
+        key == KEY_M ? KEY_PUNTO : key == KEY_N ? KEY_COMA : key == KEY_X ? KEY_F9 :
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
         break;
 #endif
 
@@ -927,125 +944,59 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         key == KEY_C ? KEY_SLASH : key == KEY_Z ? KEY_PTOCOMA : key == KEY_H ? KEY_BKSLASH : key == KEY_J ? KEY_ACORCHE :
         key == KEY_K ? KEY_COMILLA : key == KEY_L ? KEY_CCORCHE : key == KEY_B ? KEY_BKSLASH : key == KEY_N ? KEY_COMA :
         key == KEY_M ? KEY_PUNTO :
-        (key == KEY_3 || key == KEY_6 || key == KEY_7) ? key : 0;
-        break;
-#endif
-
-#ifdef symbols_galak
-        case galak:
-        keymodif = 
-        key == KEY_O ? 0 :
-        key == KEY_L ? 0 :
-        key == KEY_Z ? 0 :
-        key == KEY_V ? 0 :
-        key == KEY_N ? 0 :
-        key == KEY_M ? 0 :
-        1; 
-		key =
-		key == KEY_O ? KEY_PTOCOMA : key == KEY_L ? KEY_IGUAL : key == KEY_Z ? KEY_ACORCHE : key == KEY_V ? KEY_SLASH :
-		key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA :
-        key == KEY_P ? KEY_2 : key == KEY_J ? KEY_IGUAL : key == KEY_K ? KEY_PTOCOMA : key == KEY_C ? KEY_SLASH :
-        key == KEY_B ? KEY_ACORCHE :
-        (key == KEY_3 || key == KEY_6 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
-        break;
-#endif
-
-#ifdef symbols_multi
-    case multi:
-        keymodif = 
-        key == KEY_7 ? 0 :
-        key == KEY_Y ? 0 :
-        key == KEY_U ? 0 :
-        key == KEY_O ? 0 :
-        key == KEY_J ? 0 :
-        key == KEY_L ? 0 :
-        key == KEY_V ? 0 :
-        key == KEY_N ? 0 :
-        key == KEY_M ? 0 :
-        1; 
-        key =
-        key == KEY_6 ? KEY_7 : key == KEY_8 ? KEY_9 : key == KEY_9 ? KEY_0 :
-        key == KEY_7 ? KEY_COMILLA : key == KEY_0 ? KEY_MENOS : key == KEY_R ? KEY_COMA :
-        key == KEY_T ? KEY_PUNTO : key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE :
-        key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_COMILLA : key == KEY_F ? KEY_ACORCHE :
-        key == KEY_G ? KEY_CCORCHE : key == KEY_H ? KEY_6 : key == KEY_J ? KEY_MENOS : 
-        key == KEY_K ? KEY_IGUAL : key == KEY_L ? KEY_IGUAL : key == KEY_Z ? KEY_PTOCOMA :
-        key == KEY_C ? KEY_SLASH : key == KEY_V ? KEY_SLASH : key == KEY_B ? KEY_8 :
-        key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
-        (key == KEY_2 || key == KEY_3) ? key : 0;
-        break;
-#endif
-
-#ifdef symbols_ht8
-    case ht8:
-        keymodif = 
-        key == KEY_D ? 0 :
-        key == KEY_H ? 0 :
-        key == KEY_Y ? 0 :
-        key == KEY_U ? 0 :
-        key == KEY_2 ? 0 :        
-        key == KEY_0 ? 0 :
-        key == KEY_O ? 0 :
-        key == KEY_J ? 0 :
-        key == KEY_Z ? 0 :
-        key == KEY_V ? 0 :
-        key == KEY_N ? 0 :
-        key == KEY_M ? 0 :
-        1; 
-        key =
-        key == KEY_D ? KEY_F2 : key == KEY_H ? KEY_F4 :
-        key == KEY_2 ? KEY_BKSLASH : key == KEY_0 ? KEY_F1 : key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE :
-        key == KEY_O ? KEY_PTOCOMA : key == KEY_L ? KEY_IGUAL : key == KEY_Z ? KEY_MENOS : key == KEY_V ? KEY_SLASH :
-        key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA :
-        key == KEY_P ? KEY_2 : key == KEY_J ? KEY_IGUAL : key == KEY_K ? KEY_PTOCOMA : key == KEY_C ? KEY_SLASH :
-        key == KEY_B ? KEY_MENOS :
-        (key == KEY_3 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7) ? key : 0;
         break;
 #endif
 
 #ifdef symbols_bbc
-        case bbc:
-        keymodif = 
-        key == KEY_2 ? 0 : 
-        key == KEY_W ? 0 : 
-        key == KEY_A ? 0 : 
-        key == KEY_O ? 0 : 
-        key == KEY_V ? 0 :
-        key == KEY_Z ? 0 : 
+        case bbc:        
+        keymodif =         
+        key == KEY_D ? 0 :
         key == KEY_H ? 0 :
+        key == KEY_O ? 0 :
+        key == KEY_V ? 0 : 
+        key == KEY_Y ? 0 : 
+        key == KEY_U ? 0 : 
+        key == KEY_Z ? 0 :
         key == KEY_J ? 0 : 
-        key == KEY_N ? 0 : 
-        key == KEY_M ? 0 :
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :         
+        key == KEY_0 ? 0 : 
         1; 
         key =
-        key == KEY_2 ? KEY_TLD : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA : key == KEY_W ? KEY_F12 :
-        key == KEY_Q ? KEY_F12 : key == KEY_S ? KEY_LESS : key == KEY_A ? KEY_MENOS : key == KEY_O ? KEY_PTOCOMA :
-        key == KEY_P ? KEY_2 : key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_X ? KEY_BKSLASH :
-        key == KEY_Z ? KEY_COMILLA : key == KEY_H ? KEY_IGUAL : key == KEY_J ? KEY_BKSLASH : key == KEY_K ? KEY_PTOCOMA :
-        key == KEY_L ? KEY_MENOS : key == KEY_B ? KEY_COMILLA : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
-        (key == KEY_3 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
+        key == KEY_2 ? KEY_TLD : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA : key == KEY_0 ? KEY_BKSLASH :
+        key == KEY_A ? KEY_IGUAL : key == KEY_S ? KEY_LESS : key == KEY_D ? KEY_LESS : key == KEY_A ? KEY_IGUAL : key == KEY_H ? KEY_IGUAL :
+        key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_2 : key == KEY_V ? KEY_SLASH : key == KEY_Y ? KEY_ACORCHE :
+        key == KEY_C ? KEY_SLASH : key == KEY_X ? KEY_BKSLASH : key == KEY_Z ? KEY_COMILLA : key == KEY_U ? KEY_CCORCHE :
+        key == KEY_J ? KEY_MENOS : key == KEY_K ? KEY_PTOCOMA : key == KEY_L ? KEY_MENOS : key == KEY_F ? KEY_ACORCHE :
+        key == KEY_B ? KEY_COMILLA : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO : key == KEY_G ? KEY_CCORCHE :
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
         break;
 #endif
 
-#ifdef symbols_aco
-        case aco:
-        keymodif = 
-        key == KEY_D ? 0 : 
-        key == KEY_U ? 0: 
+#ifdef symbols_electron
+        case electron:
+        keymodif =        
         key == KEY_O ? 0 : 
         key == KEY_V ? 0 : 
         key == KEY_Z ? 0 :
         key == KEY_J ? 0 : 
         key == KEY_N ? 0 :
-        key == KEY_M ? 0 : 
+        key == KEY_M ? 0 :         
+        key == KEY_F ? 2 :
+        key == KEY_G ? 2 :
+        key == KEY_D ? 2 :
+        key == KEY_A ? 2 :
+        key == KEY_U ? 2 :
         1; 
         key =
-        key == KEY_2 ? KEY_0 : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA : key == KEY_D ? KEY_BKSLASH :
-        key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE : key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_2 :
-        key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_X ? KEY_ACORCHE : key == KEY_Z ? KEY_COMILLA :
+        key == KEY_2 ? KEY_0 : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA : key == KEY_D ? KEYPAD_6 :
+        key == KEY_A ? KEYPAD_4 : key == KEY_0 ? KEYPAD_2 : key == KEY_H ? KEYPAD_4 : key == KEY_S ? KEYPAD_6 : 
+        key == KEY_Y ? KEYPAD_1 : key == KEY_U ? KEYPAD_1 : key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_2 : key == KEY_G ? KEY_CCORCHE :
+        key == KEY_F ? KEY_ACORCHE : key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_X ? KEY_ACORCHE : key == KEY_Z ? KEY_COMILLA :
         key == KEY_J ? KEY_MENOS : key == KEY_K ? KEY_PTOCOMA : key == KEY_L ? KEY_MENOS : key == KEY_B ? KEY_COMILLA :
         key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
-        (key == KEY_3 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
         break;
 #endif
 
@@ -1068,7 +1019,7 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         key == KEY_U ? KEY_CCORCHE : key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_COMILLA : key == KEY_V ? KEY_SLASH :
         key == KEY_C ? KEY_SLASH : key == KEY_Z ? KEY_PTOCOMA : key == KEY_H ? KEY_6 : key == KEY_J ? KEY_MENOS :
         key == KEY_K ? KEY_IGUAL : key == KEY_L ? KEY_IGUAL : key == KEY_B ? KEY_8 : key == KEY_N ? KEY_COMA : 
-        key == KEY_M ? KEY_PUNTO : (key == KEY_3 || key == KEY_2) ? key : 0;
+        key == KEY_M ? KEY_PUNTO : (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4 || key == KEY_5) ? key : 0;
         break;
 #endif
 
@@ -1096,89 +1047,10 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_Z ? KEY_PTOCOMA : key == KEY_J ? KEY_IGUAL :
         key == KEY_K ? KEY_MENOS : key == KEY_L ? KEY_BKSLASH : key == KEY_B ? KEY_CCORCHE : key == KEY_M ? KEY_PUNTO :
         key == KEY_N ? KEY_COMA : key == KEY_0 ? KEY_ACORCHE :
-        (key == KEY_3 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
         break;
 #endif
 
-#ifdef symbols_ori
-		case ori:
-        keymodif =         
-        key == KEY_D ? 0 : 
-        key == KEY_7 ? 0 : 
-        key == KEY_Y ? 0 : 
-        key == KEY_U ? 0 : 
-        key == KEY_O ? 0 :
-        key == KEY_V ? 0 : 
-        key == KEY_J ? 0 :
-        key == KEY_L ? 0 : 
-        key == KEY_N ? 0 : 
-        key == KEY_M ? 0 : 
-        1; 
-        key =                
-        key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA : key == KEY_G ? KEY_CCORCHE : key == KEY_F ? KEY_ACORCHE :
-        key == KEY_D ? KEY_BKSLASH : key == KEY_S ? KEY_BKSLASH : key == KEY_6 ? KEY_7 : key == KEY_7 ? KEY_COMILLA :
-        key == KEY_8 ? KEY_9 : key == KEY_9 ? KEY_0 : key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE :
-        key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_COMILLA : key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH :
-        key == KEY_X ? KEY_MENOS : key == KEY_Z ? KEY_PTOCOMA : key == KEY_H ? KEY_6 : key == KEY_J ? KEY_MENOS :
-        key == KEY_K ? KEY_IGUAL : key == KEY_L ? KEY_IGUAL : key == KEY_B ? KEY_8 : key == KEY_N ? KEY_COMA :
-        key == KEY_M ? KEY_PUNTO : (key == KEY_3 || key == KEY_2) ? key : 0;
-        break;
-#endif
-
-#ifdef symbols_sam
-        case sam:
-        keymodif = 
-        key == KEY_R ? 0 : 
-        key == KEY_G ? 0 : 
-        key == KEY_F ? 0 : 
-        key == KEY_A ? 0 : 
-        key == KEY_7 ? 0 :
-        key == KEY_X ? 0 : 
-        key == KEY_J ? 0 :
-        key == KEY_K ? 0 : 
-        key == KEY_N ? 0 : 
-        key == KEY_M ? 0 : 
-        1; 
-        key =
-        key == KEY_2 ? KEY_BKSLASH : key == KEY_T ? KEY_LESS : key == KEY_R ? KEY_LESS : key == KEY_G ? KEY_BKSLASH :
-        key == KEY_F ? KEY_COMILLA : key == KEY_A ? KEY_PTOCOMA : key == KEY_7 ? KEY_MENOS : key == KEY_0 ? KEY_SLASH :
-        key == KEY_O ? KEY_COMA : key == KEY_P ? KEY_2 : key == KEY_V ? KEY_7 : key == KEY_C ? KEY_MENOS :
-        key == KEY_X ? KEY_ACORCHE : key == KEY_Z ? KEY_PUNTO : key == KEY_H ? KEY_ACORCHE : key == KEY_J ? KEY_SLASH :
-        key == KEY_K ? KEY_CCORCHE : key == KEY_L ? KEY_0 : key == KEY_B ? KEY_CCORCHE : key == KEY_N ? KEY_COMA :
-        key == KEY_M ? KEY_PUNTO :
-        (key == KEY_3 || key == KEY_6 || key == KEY_8 || key == KEY_9) ? key : 0;
-        break;
-#endif
-
-#ifdef symbols_jup
-        case jup:
-        keymodif = 
-        key == KEY_U ? 4 :
-        key == KEY_S ? 4 :
-        key == KEY_A ? 0x10 :
-        key == KEY_G ? 0x10 : 
-        key == KEY_Q ? 0 : 
-        key == KEY_2 ? 0x10 : 
-        key == KEY_R ? 0 : 
-        key == KEY_D ? 0 : 
-        key == KEY_7 ? 0 : 
-        key == KEY_X ? 0 :
-        key == KEY_H ? 0 : 
-        key == KEY_J ? 0 :
-        key == KEY_K ? 0 : 
-        key == KEY_N ? 0 : 
-        key == KEY_M ? 0 :  
-        1; 
-        key =
-        key == KEY_U ? KEY_CCORCHE : key == KEY_S ? KEY_1 : key == KEY_Q ? KEY_BKSLASH :
-        key == KEY_T ? KEY_LESS : key == KEY_R ? KEY_LESS : key == KEY_F ? KEY_COMILLA :
-        key == KEY_D ? KEY_TLD : key == KEY_7 ? KEY_MENOS : key == KEY_0 ? KEY_SLASH : key == KEY_Y ? KEY_ACORCHE :
-        key == KEY_O ? KEY_COMA : key == KEY_P ? KEY_2 : key == KEY_V ? KEY_7 : key == KEY_C ? KEY_MENOS : key == KEY_X ? KEY_COMILLA :
-        key == KEY_Z ? KEY_PUNTO : key == KEY_H ? KEY_ACORCHE : key == KEY_J ? KEY_SLASH : key == KEY_K ? KEY_CCORCHE :
-        key == KEY_L ? KEY_0 : key == KEY_B ? KEY_CCORCHE : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
-        (key == KEY_3 || key == KEY_2 || key == KEY_6 || key == KEY_8 || key == KEY_9 || key == KEY_G || key == KEY_A) ? key : 0;
-        break;
-#endif
 #ifdef symbols_pc
 
     case pc: // scancodes set 2
@@ -1214,6 +1086,342 @@ void traducekey(uint8_t &key, uint8_t &keymodif, KBMODE modokb) // con esta func
         break;
 #endif
 
+#ifdef symbols_ori
+    case ori:
+        keymodif =                
+        key == KEY_D ? 0 : 
+        key == KEY_7 ? 0 : 
+        key == KEY_Y ? 0 : 
+        key == KEY_U ? 0 : 
+        key == KEY_O ? 0 :
+        key == KEY_V ? 0 : 
+        key == KEY_J ? 0 :
+        key == KEY_L ? 0 : 
+        key == KEY_N ? 0 : 
+        key == KEY_M ? 0 : 
+        1; 
+        key =                
+        key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA : key == KEY_G ? KEY_CCORCHE : key == KEY_F ? KEY_ACORCHE :
+        key == KEY_D ? KEY_BKSLASH : key == KEY_S ? KEY_BKSLASH : key == KEY_6 ? KEY_7 : key == KEY_7 ? KEY_COMILLA :
+        key == KEY_8 ? KEY_9 : key == KEY_9 ? KEY_0 : key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE :
+        key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_COMILLA : key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH :
+        key == KEY_X ? KEY_MENOS : key == KEY_Z ? KEY_PTOCOMA : key == KEY_H ? KEY_6 : key == KEY_J ? KEY_MENOS :
+        key == KEY_K ? KEY_IGUAL : key == KEY_L ? KEY_IGUAL : key == KEY_B ? KEY_8 : key == KEY_N ? KEY_COMA :
+        key == KEY_M ? KEY_PUNTO : (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4 || key == KEY_5) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_sam
+        case sam:
+        keymodif = 
+        key == KEY_R ? 0 : 
+        key == KEY_G ? 0 : 
+        key == KEY_F ? 0 : 
+        key == KEY_A ? 0 : 
+        key == KEY_7 ? 0 :
+        key == KEY_X ? 0 : 
+        key == KEY_J ? 0 :
+        key == KEY_K ? 0 : 
+        key == KEY_N ? 0 : 
+        key == KEY_M ? 0 : 
+        key == KEY_S ? 0x80 : 
+        key == KEY_Y ? 0x80 : 
+        key == KEY_U ? 0x80 : 
+        key == KEY_D ? 0x80 : 
+        1; 
+        key =
+        key == KEY_Q ? KEY_BKSLASH : key == KEY_T ? KEY_LESS : key == KEY_R ? KEY_LESS : key == KEY_G ? KEY_BKSLASH :
+        key == KEY_F ? KEY_COMILLA : key == KEY_A ? KEY_PTOCOMA : key == KEY_7 ? KEY_MENOS : key == KEY_0 ? KEY_SLASH :
+        key == KEY_O ? KEY_COMA : key == KEY_P ? KEY_2 : key == KEY_V ? KEY_7 : key == KEY_C ? KEY_MENOS :
+        key == KEY_X ? KEY_ACORCHE : key == KEY_Z ? KEY_PUNTO : key == KEY_H ? KEY_ACORCHE : key == KEY_J ? KEY_SLASH :
+        key == KEY_K ? KEY_CCORCHE : key == KEY_L ? KEY_0 : key == KEY_B ? KEY_CCORCHE : key == KEY_N ? KEY_COMA :
+        key == KEY_M ? KEY_PUNTO : key == KEY_S ? KEY_9 : key == KEY_Y ? KEY_R : key == KEY_U ? KEY_T : key == KEY_D ? KEY_LALT :
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_8 || key == KEY_9) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_jup
+        case jup:
+        keymodif = 
+        key == KEY_U ? 4 :
+        key == KEY_S ? 4 :
+        key == KEY_A ? 0x10 :
+        key == KEY_G ? 0x10 : 
+        key == KEY_Q ? 0 : 
+        key == KEY_2 ? 0x10 : 
+        key == KEY_R ? 0 : 
+        key == KEY_D ? 0 : 
+        key == KEY_7 ? 0 : 
+        key == KEY_X ? 0 :
+        key == KEY_H ? 0 : 
+        key == KEY_J ? 0 :
+        key == KEY_K ? 0 : 
+        key == KEY_N ? 0 : 
+        key == KEY_M ? 0 :  
+        1; 
+        key =
+        key == KEY_U ? KEY_CCORCHE : key == KEY_S ? KEY_1 : key == KEY_Q ? KEY_BKSLASH :
+        key == KEY_T ? KEY_LESS : key == KEY_R ? KEY_LESS : key == KEY_F ? KEY_COMILLA :
+        key == KEY_D ? KEY_TLD : key == KEY_7 ? KEY_MENOS : key == KEY_0 ? KEY_SLASH : key == KEY_Y ? KEY_ACORCHE :
+        key == KEY_O ? KEY_COMA : key == KEY_P ? KEY_2 : key == KEY_V ? KEY_7 : key == KEY_C ? KEY_MENOS : key == KEY_X ? KEY_COMILLA :
+        key == KEY_Z ? KEY_PUNTO : key == KEY_H ? KEY_ACORCHE : key == KEY_J ? KEY_SLASH : key == KEY_K ? KEY_CCORCHE :
+        key == KEY_L ? KEY_0 : key == KEY_B ? KEY_CCORCHE : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
+        (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_8 || key == KEY_9 || key == KEY_G || key == KEY_A) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_zx81
+        case zx81:
+        keymodif = 
+        key == KEY_M ? 0 :
+        key == KEY_S ? 0x80 :
+        key == KEY_I ? 0x80 :
+        1;
+        key = 
+        key == KEY_G ? KEY_3 : key == KEY_4 ? KEY_U : key == KEY_S ? KEY_N : key == KEY_I ? KEY_C : 
+        key == KEY_Y ? KEY_2 : key == KEY_F ? KEY_4 : key == KEY_D ? KEY_E : key == KEY_U ? KEY_W :
+        key == KEY_Q ? KEY_R : key == KEY_W ? KEY_T : key == KEY_E ? KEY_Y : key == KEY_8 ? KEY_I :
+        key == KEY_9 ? KEY_O : key == KEY_O ? KEY_X : key == KEY_R ? KEY_N : key == KEY_T ? KEY_M :
+        key == KEY_N ? KEY_PUNTO : key == KEY_M ? KEY_PUNTO : key == KEY_X ? KEY_SPACE :
+        (key == KEY_P || key == KEY_J || key == KEY_K || key == KEY_L || key == KEY_Z || 
+        key == KEY_C || key == KEY_V || key == KEY_B || key == KEY_H) ? key : 0;
+        
+        break;
+#endif
+
+#ifdef symbols_c16
+        case c16:
+        keymodif =         
+        key == KEY_2 ? 0 : 
+        key == KEY_O ? 0 : 
+        key == KEY_V ? 0 : 
+        key == KEY_Z ? 0 :         
+        key == KEY_J ? 0 : 
+        key == KEY_K ? 0 :
+        key == KEY_L ? 0 : 
+        key == KEY_B ? 0 : 
+        key == KEY_N ? 0 : 
+        key == KEY_M ? 0 : 
+        key == KEY_X ? 0x20 : 
+        1;   
+        key =        
+        key == KEY_2 ? KEY_ACORCHE : key == KEY_R ? KEY_COMA : key == KEY_T ? KEY_PUNTO : key == KEY_S ? KEY_MENOS :
+        key == KEY_Y ? KEY_PTOCOMA : key == KEY_U ? KEY_COMILLA : key == KEY_O ? KEY_COMILLA : key == KEY_P ? KEY_2 :
+        key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_Z ? KEY_PTOCOMA : key == KEY_H ? KEY_0 :
+        key == KEY_J ? KEY_MENOS : key == KEY_K ? KEY_IGUAL : key == KEY_L ? KEY_BKSLASH : key == KEY_B ? KEY_CCORCHE :
+        key == KEY_M ? KEY_PUNTO : key == KEY_N ? KEY_COMA : key == KEY_X ? KEY_APPS : key == KEY_D ? KEY_M :
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_ht8
+    case ht8:
+        keymodif = 
+        key == KEY_D ? 0 :
+        key == KEY_H ? 0 :
+        key == KEY_Y ? 0 :
+        key == KEY_U ? 0 :
+        key == KEY_2 ? 0 :        
+        key == KEY_0 ? 0 :
+        key == KEY_O ? 0 :
+        key == KEY_J ? 0 :
+        key == KEY_Z ? 0 :
+        key == KEY_V ? 0 :
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :
+        1; 
+        key =
+        key == KEY_D ? KEY_F2 : key == KEY_H ? KEY_F4 :
+        key == KEY_2 ? KEY_BKSLASH : key == KEY_0 ? KEY_F1 : key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE :
+        key == KEY_O ? KEY_PTOCOMA : key == KEY_L ? KEY_IGUAL : key == KEY_Z ? KEY_MENOS : key == KEY_V ? KEY_SLASH :
+        key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA :
+        key == KEY_P ? KEY_2 : key == KEY_J ? KEY_IGUAL : key == KEY_K ? KEY_PTOCOMA : key == KEY_C ? KEY_SLASH :
+        key == KEY_B ? KEY_MENOS :
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_galak
+        case galak:
+        keymodif = 
+        key == KEY_O ? 0 :
+        key == KEY_L ? 0 :
+        key == KEY_Z ? 0 :
+        key == KEY_V ? 0 :
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :
+        1; 
+        key =
+        key == KEY_O ? KEY_PTOCOMA : key == KEY_L ? KEY_IGUAL : key == KEY_Z ? KEY_ACORCHE : key == KEY_V ? KEY_SLASH :
+        key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA :
+        key == KEY_P ? KEY_2 : key == KEY_J ? KEY_IGUAL : key == KEY_K ? KEY_PTOCOMA : key == KEY_C ? KEY_SLASH :
+        key == KEY_B ? KEY_ACORCHE :
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_multi
+    case multi:
+        keymodif = 
+        key == KEY_7 ? 0 :
+        key == KEY_Y ? 0 :
+        key == KEY_U ? 0 :
+        key == KEY_O ? 0 :
+        key == KEY_J ? 0 :
+        key == KEY_L ? 0 :
+        key == KEY_V ? 0 :
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :
+        1; 
+        key =
+        key == KEY_6 ? KEY_7 : key == KEY_8 ? KEY_9 : key == KEY_9 ? KEY_0 :
+        key == KEY_7 ? KEY_COMILLA : key == KEY_0 ? KEY_MENOS : key == KEY_R ? KEY_COMA :
+        key == KEY_T ? KEY_PUNTO : key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE :
+        key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_COMILLA : key == KEY_F ? KEY_ACORCHE :
+        key == KEY_G ? KEY_CCORCHE : key == KEY_H ? KEY_6 : key == KEY_J ? KEY_MENOS : 
+        key == KEY_K ? KEY_IGUAL : key == KEY_L ? KEY_IGUAL : key == KEY_Z ? KEY_PTOCOMA :
+        key == KEY_C ? KEY_SLASH : key == KEY_V ? KEY_SLASH : key == KEY_B ? KEY_8 :
+        key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
+        (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4 || key == KEY_5) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_zx80
+        case zx80:
+        keymodif = 
+        key == KEY_M ? 0 :
+        1;
+        key = 
+        key == KEY_G ? KEY_3 : key == KEY_4 ? KEY_U : key == KEY_Y ? KEY_2 : key == KEY_1 ? KEY_ENTER :
+        key == KEY_S ? KEY_1 : key == KEY_U ? KEY_B : key == KEY_F ? KEY_4 :
+        key == KEY_8 ? KEY_I : key == KEY_9 ? KEY_O : key == KEY_P ? KEY_Y :
+        key == KEY_B ? KEY_P : key == KEY_O ? KEY_X : key == KEY_R ? KEY_N : key == KEY_T ? KEY_M :
+        key == KEY_N ? KEY_PUNTO : key == KEY_M ? KEY_PUNTO : key == KEY_X ? KEY_SPACE :
+        (key == KEY_P || key == KEY_J || key == KEY_K || key == KEY_L || key == KEY_Z ||
+        key == KEY_C || key == KEY_V || key == KEY_B || key == KEY_H) ? key : 0;        
+        break;
+#endif
+
+#ifdef symbols_atom
+        case atom:
+        keymodif =      
+        key == KEY_2 ? 0 :
+        key == KEY_O ? 0 :
+        key == KEY_V ? 0 : 
+        key == KEY_Z ? 0 :
+        key == KEY_J ? 0 : 
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :
+        key == KEY_Y ? 0 :
+        key == KEY_U ? 0 :        
+        key == KEY_D ? 0 :        
+        1; 
+        key =
+        key == KEY_2 ? KEY_IGUAL : key == KEY_T ? KEY_PUNTO : key == KEY_R ? KEY_COMA : key == KEY_D ? KEY_BKSLASH :         
+        key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE : key == KEY_O ? KEY_PTOCOMA : key == KEY_P ? KEY_2 :
+        key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_Z ? KEY_COMILLA : key == KEY_B ? KEY_COMILLA : 
+        key == KEY_J ? KEY_MENOS : key == KEY_K ? KEY_PTOCOMA : key == KEY_L ? KEY_MENOS : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_cpet
+        case cpet:
+        keymodif = 
+
+        key == KEY_L ? 0 : 
+        key == KEY_J ? 0 : 
+        key == KEY_Y ? 0 : 
+        key == KEY_D ? 0 :
+        key == KEY_U ? 0 :
+        key == KEY_V ? 0 : 
+        key == KEY_N ? 0 : 
+        key == KEY_M ? 0 : 
+        key == KEY_O ? 0 : 
+        key == KEY_7 ? 0 :         
+        
+        1;   
+        key =        
+        key == KEY_6 ? KEY_7 : key == KEY_8 ? KEY_9 : key == KEY_9 ? KEY_0 : key == KEY_7 ? KEY_COMILLA : key == KEY_B ? KEY_8 :
+        key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE : key == KEY_H ? KEY_6 : key == KEY_P ? KEY_COMILLA : 
+        key == KEY_J ? KEY_MENOS : key == KEY_K ? KEY_IGUAL : key == KEY_L ? KEY_IGUAL : key == KEY_D ? KEY_BKSLASH :
+        key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : key == KEY_N ? KEY_COMA : key == KEY_M ? KEY_PUNTO :
+        key == KEY_R ? KEY_COMA : key == KEY_T ? KEY_PUNTO : key == KEY_O ? KEY_PTOCOMA : key == KEY_Z ? KEY_PTOCOMA :         
+        (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4 || key == KEY_5) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_eg2000
+        case eg2000:
+        keymodif = 
+        key == KEY_V ? 0 :
+        key == KEY_Z ? 0 :
+        key == KEY_2 ? 0 :
+        key == KEY_O ? 0 :
+        key == KEY_J ? 0 :
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :
+        1; 
+        key = 
+        key == KEY_Z ? KEY_MENOS : key == KEY_B ? KEY_MENOS : key == KEY_2 ? KEY_ACORCHE : key == KEY_P ? KEY_2 : 
+        key == KEY_C ? KEY_SLASH : key == KEY_V ? KEY_SLASH : key == KEY_O ? KEY_PTOCOMA : key == KEY_K ? KEY_PTOCOMA :
+        key == KEY_L ? KEY_COMILLA : key == KEY_J ? KEY_COMILLA : key == KEY_N ? KEY_COMA : key == KEY_R ? KEY_COMA : 
+        key == KEY_M ? KEY_PUNTO : key == KEY_T ? KEY_PUNTO : 
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_lynx
+        case lynx:
+        keymodif = 
+        key == KEY_J ? 0 :
+        key == KEY_2 ? 0 :
+        key == KEY_Y ? 0 :
+        key == KEY_U ? 0 :
+        key == KEY_O ? 0 :
+        key == KEY_Z ? 0 :
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :
+        key == KEY_V ? 0 :
+        key == KEY_Q ? 0x81 :
+        1; 
+        key = 
+        key == KEY_J ? KEY_MENOS : key == KEY_L ? KEY_MENOS : key == KEY_2 ? KEY_IGUAL : key == KEY_X ? KEY_IGUAL : key == KEY_Q ? KEY_CCORCHE :
+        key == KEY_Y ? KEY_ACORCHE : key == KEY_U ? KEY_CCORCHE : key == KEY_O ? KEY_PTOCOMA : key == KEY_K ? KEY_PTOCOMA : 
+        key == KEY_Z ? KEY_COMILLA : key == KEY_B ? KEY_COMILLA : key == KEY_N ? KEY_COMA : key == KEY_R ? KEY_COMA : key == KEY_P ? KEY_2 : 
+        key == KEY_M ? KEY_PUNTO : key == KEY_T ? KEY_PUNTO : key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : 
+        (key == KEY_1 || key == KEY_3 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
+        break;
+#endif
+
+#ifdef symbols_enterp
+        case enterp:
+        keymodif = 
+        key == KEY_J ? 0 :
+        key == KEY_2 ? 0 :
+        key == KEY_Y ? 0 :
+        key == KEY_U ? 0 :
+        key == KEY_O ? 0 :
+        key == KEY_Z ? 0 :
+        key == KEY_N ? 0 :
+        key == KEY_M ? 0 :
+        key == KEY_V ? 0 : 
+        key == KEY_D ? 0 : 
+        key == KEY_H ? 0 : 
+        key == KEY_3 ? 4 :
+        key == KEY_Q ? 4 :        
+        1; 
+        key = 
+        key == KEY_J ? KEY_MENOS : key == KEY_L ? KEY_MENOS : key == KEY_H ? KEY_IGUAL : key == KEY_A ? KEY_IGUAL : 
+        key == KEY_2 ? KEY_ACORCHE : key == KEY_Y ? KEY_CCORCHE : key == KEY_F ? KEY_CCORCHE : key == KEY_P ? KEY_2 : key == KEY_X ? KEY_3 :
+        key == KEY_U ? KEY_BKSLASH : key == KEY_G ? KEY_BKSLASH : key == KEY_Z ? KEY_COMILLA : key == KEY_B ? KEY_COMILLA :         
+        key == KEY_O ? KEY_PTOCOMA : key == KEY_K ? KEY_PTOCOMA : key == KEY_N ? KEY_COMA : key == KEY_R ? KEY_COMA : 
+        key == KEY_M ? KEY_PUNTO : key == KEY_T ? KEY_PUNTO : key == KEY_V ? KEY_SLASH : key == KEY_C ? KEY_SLASH : 
+        key == KEY_D ? KEY_LESS : key == KEY_S ? KEY_LESS : key == KEY_3 ? KEY_A : key == KEY_Q ? KEY_ACORCHE :
+        (key == KEY_1 || key == KEY_4 || key == KEY_5 || key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9 || key == KEY_0) ? key : 0;
+        break;
+#endif
+
     default:
         key = 0;
         break;
@@ -1231,9 +1439,14 @@ void pulsateclaconsymbol(unsigned char row, unsigned char col, KBMODE modokb)
     // 0x8 -> RAlt (AltGr)
     // 0x10 -> RCTrl
     // 0x20 -> Requiere 0xE0
-  
+    // 0x40 -> AltCode
+    // 0x80 -> Requiere SHIFT + ENTER (ZX81)
+    // 0x80 -> Symbol (SAM)
+    // 0x80 -> Copyright (LYNX)
+    
+    
     uint8_t key = 0, keymodif = 0;
-    unsigned char shift = 0, ctrl = 0, rctrl = 0, alt = 0, altgr = 0, specialkey = 0, altcode = 0;
+    unsigned char shift = 0, ctrl = 0, rctrl = 0, alt = 0, altgr = 0, specialkey = 0, altcode = 0, zx81function = 0, samsymbol = 0, copyrightlynx = 0;
     typematicfirst = 0;
     typematic_codeaux = 0;
     key = codeset == 1 ? mapSET1[row][col] : mapZX[row][col];
@@ -1253,21 +1466,46 @@ void pulsateclaconsymbol(unsigned char row, unsigned char col, KBMODE modokb)
                 rctrl = (keymodif & 0x10) == 0x10;
                 specialkey = (keymodif & 0x20) == 0x20;
                 altcode = (keymodif & 0x40) == 0x40;
+                zx81function = (modo == zx81 && (keymodif & 0x80) == 0x80);
+                samsymbol = (modo == sam && (keymodif & 0x80) == 0x80);
+                copyrightlynx = (modo == lynx && (keymodif & 0x80) == 0x80);
             }
             
             if (key && !altcode)
             {
+                if (copyrightlynx) {
+                    sendPS2(KEY_LSHIFT);                    
+                    sendPS2(KEY_ACORCHE);                    
+                    _delay_ms(20);
+                    sendPS2(0xF0);
+                    sendPS2(KEY_ACORCHE);
+                    _delay_ms(20);
+                    sendPS2(KEY_LSHIFT);
+                    _delay_ms(20);
+                }
                 if (shift) { if (codeset == 2) { sendPS2(KEY_LSHIFT); typematic_codeaux = KEY_LSHIFT; } else { sendPS2(KS1_LSHIFT); typematic_codeaux = KS1_LSHIFT; } }
                 if (ctrl) { if (codeset == 2) { sendPS2(KEY_LCTRL); typematic_codeaux = KEY_LCTRL; } } 
                 if (alt) { if (codeset == 2) { sendPS2(KEY_LALT); typematic_codeaux = KEY_LALT; } } 
                 if (altgr) { sendPS2_aux(0xE0, 0); if (codeset == 2) sendPS2(KEY_RALT); else sendPS2(KS1_RALT); } 
                 if (rctrl) { if (codeset == 2) { sendPS2_aux(0xE0, 0); sendPS2(KEY_RCTRL); } } 
                 if (specialkey) sendPS2_aux(0xE0, 0);
-                if (!altcode)
-                {
-                    sendPS2((uint8_t)key);
-                    typematic_code = (uint8_t)key;
+                if (zx81function) {
+                    sendPS2(KEY_LSHIFT);
+                    sendPS2(KEY_ENTER);
+                    _delay_ms(100);
+                    sendPS2(0xF0);
+                    sendPS2(KEY_ENTER);
+                    sendPS2(0xF0);
+                    sendPS2(KEY_LSHIFT);
+                    _delay_ms(100);
                 }
+                if (samsymbol) {
+                    sendPS2(KEY_TLD);
+                    _delay_ms(100);
+                }
+                sendPS2((uint8_t)key);
+                typematic_code = (uint8_t)key;
+
             }
         }
     }
@@ -1287,9 +1525,13 @@ void sueltateclaconsymbol(unsigned char row, unsigned char col, KBMODE modokb)
     // 0x8 -> RAlt (AltGr)
     // 0x10 -> RCTrl
     // 0x20 -> Requiere 0xE0
+    // 0x40 -> AltCode
+    // 0x80 -> Requiere SHIFT + ENTER (ZX81)
+    // 0x80 -> Symbol (SAM)
+    // 0x80 -> Copyright (LYNX)
   
     uint8_t key = 0, keymodif = 0;
-    unsigned char shift = 0, ctrl = 0, rctrl = 0, alt = 0, altgr = 0, specialkey = 0, altcode = 0;
+    unsigned char shift = 0, ctrl = 0, rctrl = 0, alt = 0, altgr = 0, specialkey = 0, altcode = 0, zx81function = 0, samsymbol = 0, copyrightlynx = 0;
     unsigned char d1 = 0, d2 = 0, d3 = 0;
     typematic_code = 0;
     key = mapZX[row][col];
@@ -1308,6 +1550,9 @@ void sueltateclaconsymbol(unsigned char row, unsigned char col, KBMODE modokb)
                 rctrl = (keymodif & 0x10) == 0x10;
                 specialkey = (keymodif & 0x20) == 0x20;
                 altcode = (keymodif & 0x40) == 0x40;
+                zx81function = (modo == zx81 && (keymodif & 0x80) == 0x80);
+                samsymbol = (modo == sam && (keymodif & 0x80) == 0x80);
+                copyrightlynx = (modo == lynx && (keymodif & 0x80) == 0x80);
             }
 
             if (key)
@@ -1317,9 +1562,19 @@ void sueltateclaconsymbol(unsigned char row, unsigned char col, KBMODE modokb)
               
                     if (codeset == 2)
                     {
+                        if (zx81function) _delay_ms(100);
                         if (specialkey) sendPS2_aux(0xE0, 0);
-                        sendPS2(0xF0);            
-                        sendPS2((uint8_t)key); 
+                        sendPS2(0xF0);
+                        sendPS2((uint8_t)key);
+                        if (samsymbol) {
+                            sendPS2(0xF0);
+                            sendPS2(KEY_TLD);                            
+                        }
+
+                        if (copyrightlynx) {                            
+                            sendPS2(0xF0);                            
+                            sendPS2(KEY_LSHIFT);                            
+                        }
                     }
                     else sendPS2((uint8_t)key + KS1_RELEASE);
 
@@ -1327,7 +1582,7 @@ void sueltateclaconsymbol(unsigned char row, unsigned char col, KBMODE modokb)
                     if (ctrl) { if (codeset == 2) { sendPS2(0xF0); sendPS2(KEY_LCTRL); } }
                     if (alt) { if (codeset == 2) { sendPS2(0xF0); sendPS2(KEY_LALT); } }
                     if (altgr) { sendPS2(0xE0); if (codeset == 2) { sendPS2(0xF0); sendPS2(KEY_RALT); } else sendPS2(KS1_RALT + KS1_RELEASE); }
-                    if (rctrl) { if (codeset == 2) { sendPS2(0xE0); sendPS2(0xF0); sendPS2(KEY_RCTRL); } }          
+                    if (rctrl) { if (codeset == 2) { sendPS2(0xE0); sendPS2(0xF0); sendPS2(KEY_RCTRL); } }
                 }
                 else
                 {
@@ -1354,23 +1609,29 @@ void pulsateclaconshift(unsigned char row, unsigned char col, unsigned char key)
 {
     typematicfirst = 0;
     typematic_codeaux = 0;
+    key = key == KEY_F2 && (modo == zx80 || modo == zx81) ? 0 : key; // En el core de ZX80/81 no se intercepta la tecla F2 como EDIT
+    key = key == KEY_F2 && modo == sam ? KEY_RWIN : key; // En el core de Sam Coupe EDIT es la tecla derecha de Windows
+    key = (modo == sam || modo == enterp)&& row == 6 && col == 0 ? KEY_TAB : key;
     if (!key) //si no esta mapeada saca la mayuscula
     {
-        if (codeset == 2) { sendPS2(KEY_LSHIFT); typematic_codeaux = KEY_LSHIFT; } else { sendPS2(KS1_LSHIFT); typematic_codeaux = KS1_LSHIFT; }
+        if (codeset == 2) { sendPS2(KEY_LSHIFT); typematic_codeaux = KEY_LSHIFT; } else { sendPS2(KS1_LSHIFT); typematic_codeaux = KS1_LSHIFT; }        
         if (codeset == 2) { sendPS2(mapZX[row][col]); typematic_code = mapZX[row][col]; } else { sendPS2(mapSET1[row][col]); typematic_code = mapSET1[row][col]; }
     }
     else
     {
-        if (codeset == 2 && (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_UP || key == KEY_DOWN)) { sendPS2(0xE0); typematic_codeaux = 0xE0; } //Es una tecla del codeset2 que necesita E0
-        if (codeset == 1 && (key == KS1_LEFT || key == KS1_RIGHT || key == KS1_UP || key == KS1_DOWN)) { sendPS2(0xE0); typematic_codeaux = 0xE0; }//Es una tecla del codeset1 que necesita E0
+        if (codeset == 2 && (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_UP || key == KEY_DOWN || key == KEY_RWIN)) { sendPS2(0xE0); typematic_codeaux = 0xE0; } //Es una tecla del codeset2 que necesita E0
+        if (codeset == 1 && (key == KS1_LEFT || key == KS1_RIGHT || key == KS1_UP || key == KS1_DOWN || key == KS1_RWIN)) { sendPS2(0xE0); typematic_codeaux = 0xE0; }//Es una tecla del codeset1 que necesita E0
         sendPS2(key);
         typematic_code = key;
-}
+    }
 }
 
 void sueltateclaconshift(unsigned char row, unsigned char col, unsigned char key)
 {
     typematic_code = 0;
+    key = key == KEY_F2 && (modo == zx80 || modo == zx81) ? 0 : key; // En el core de ZX80/81 no se intercepta la tecla F2 como EDIT
+    key = key == KEY_F2 && modo == sam ? KEY_RWIN : key; // En el core de Sam Coupe EDIT es la tecla derecha de Windows
+    key = (modo == sam || modo == enterp) && row == 6 && col == 0 ? KEY_TAB : key;
     if (!key) //si no esta mapeada saca la mayuscula
     {
         if (codeset == 2) { sendPS2(0xF0); sendPS2(mapZX[row][col]); sendPS2(0xF0); sendPS2(KEY_LSHIFT); }
@@ -1378,8 +1639,8 @@ void sueltateclaconshift(unsigned char row, unsigned char col, unsigned char key
     }
     else
     {
-        if (codeset == 2 && (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_UP || key == KEY_DOWN)) sendPS2(0xE0); //Es una tecla del codeset2 que necesita E0
-        if (codeset == 1 && (key == KS1_LEFT || key == KS1_RIGHT || key == KS1_UP || key == KS1_DOWN)) sendPS2(0xE0); //Es una tecla del codeset1 que necesita E0
+        if (codeset == 2 && (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_UP || key == KEY_DOWN || key == KEY_RWIN)) sendPS2(0xE0); //Es una tecla del codeset2 que necesita E0
+        if (codeset == 1 && (key == KS1_LEFT || key == KS1_RIGHT || key == KS1_UP || key == KS1_DOWN || key == KS1_RWIN)) sendPS2(0xE0); //Es una tecla del codeset1 que necesita E0
         if (codeset == 2) { sendPS2(0xF0); sendPS2(key); }
         else sendPS2(key + KS1_RELEASE);
     }
@@ -1675,7 +1936,7 @@ void matrixScan()
                 }    
                 if (b == 1) //VGA-SWICH
                 {
-                    if (modo == zx || modo == at8 || modo == bbc || modo == vic || modo == ori || modo == sms || modo == ht8)
+                    if (modo == zx || modo == at8 || modo == bbc || modo == vic || modo == ori || modo == ht8)
                     {
                         pulsafn(A_G_ROW, G_COL, codeset == 1 ? KS1_SCRLCK : KEY_SCRLCK, 0, 0, 1, 1, 0, 0);
                     }
@@ -1864,7 +2125,7 @@ void matrixScan()
             // Teclas especiales
             if ((matriz[A_G_ROW][S_COL] & 0x01) && (modo || fkbmode)) pulsafn(A_G_ROW, S_COL, codeset == 1 ? KS1_LESS : KEY_LESS, 0, kbshift, kbcontrol, kbalt, kbaltgr, kblwin);       // (Z) KEY_LESS
 
-            if ((matriz[Y_P_ROW][I_COL] & 0x01) && (modo || fkbmode)) pulsafn(Y_P_ROW, I_COL, codeset == 1 ? KS1_BLOQNUM : KEY_BLOQNUM, 0, kbshift, kbcontrol, kbalt, kbaltgr, kblwin); // (I) Bloq Num
+            if ((matriz[Y_P_ROW][I_COL] & 0x01) && (modo || fkbmode)) pulsafn(Y_P_ROW, I_COL, codeset == 1 ? KS1_CAPS : (modo == vic || modo == c16) ? KEY_BLOQNUM : modo == cpet ? KEY_APPS : KEY_CAPS, modo == cpet, kbshift, kbcontrol, kbalt, kbaltgr, kblwin); // (I) Bloq Mayús (Bloq Num para C16 y VIC20)
             if ((matriz[Y_P_ROW][O_COL] & 0x01) && (modo || fkbmode)) pulsafn(Y_P_ROW, O_COL, codeset == 1 ? KS1_ACORCHE : KEY_ACORCHE, 0, kbshift, kbcontrol, kbalt, kbaltgr, kblwin); // (O) KEY_ACORCHE
             if ((matriz[Y_P_ROW][P_COL] & 0x01) && (modo || fkbmode)) pulsafn(Y_P_ROW, P_COL, codeset == 1 ? KS1_CCORCHE : KEY_CCORCHE, 0, kbshift, kbcontrol, kbalt, kbaltgr, kblwin); // (P) KEY_CCORCHE
 
