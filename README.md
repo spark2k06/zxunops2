@@ -1,4 +1,4 @@
-# zxunops2 (final version)
+# zxunops2 (RELOADED)
 
 Converts the ZX Spectrum keyboard into PS/2 for ZXUno
 
