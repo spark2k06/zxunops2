@@ -1,0 +1,33 @@
+= Manual de zxunops2
+:author: kounch
+:revnumber: 1.0.0
+:doctype: book
+:notitle:
+:front-cover-image: image:img/portadazxunops2.jpg[]
+:email: kounch@users.noreply.github.com
+:Revision: 1.0
+:description: Manual en castellano de zxunps2
+:keywords: Manual, Castellano, zxunops2
+:icons: font
+:source-highlighter: rouge
+:toc: left
+:toc-title: Índice
+:toclevels: 4
+
+<<<
+
+== Introducción
+
+zxunops2 es un conversor de teclado de membrana de ZX Spectrum a PS/2 para controlar un ZX-Uno.
+
+- Código base original de Quest
+- https://github.com/neurorulez/zx1ps2[Primer desarrollo] y primeros atajos de celado de Neuro (@neurorulez)
+- Mejoras, optimizaciones y nuevos atajos de teclado por @spark2k06
+- Gracias a @desUBIkado por hacer las pruebas y aportar nuevas ideas para la versión alternativa
+
+La conexión es a través de una placa Arduino, que se encarga de transformar las pulsaciones al protocolo PS/2 de teclado, usando https://github.com/spark2k06/zxunops2[el firmware zxunops2]. Esta placa está programada de manera que pueda comportarse de distintas maneras (modos de teclado) según se desee.
+
+[.text-center]
+image:./img/conexiones_zxunops2.jpg[pdfwidth=80%]
+
+include::zxunops2_es.adoc[]
