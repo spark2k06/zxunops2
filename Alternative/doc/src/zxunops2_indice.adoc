@@ -1,6 +1,6 @@
 = Manual de zxunops2
 :author: kounch
-:revnumber: 1.0.0
+:revnumber: 1.0.1
 :doctype: book
 :notitle:
 :front-cover-image: image:img/portadazxunops2.jpg[]
